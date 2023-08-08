@@ -10,8 +10,8 @@ class JsonNode {
 public:
 	JsonNode() {
 		ifname = 0; type = 0; name = ""; val = "";
-	}//type: 1Öµ 2Êı×é 3¶ÔÏó
-	static int top;//×ÜµãÊı¶ø²»ÊÇ×Ü±ßÊı
+	}//type: 1å€¼ 2æ•°ç»„ 3å¯¹è±¡
+	static int top;//æ€»ç‚¹æ•°è€Œä¸æ˜¯æ€»è¾¹æ•°
 	vector<int>to;
 	bool ifname;//0no 1yes
 	int type;
@@ -35,7 +35,7 @@ bool checkname(int now) {
 		i++;
 		break;
 	}
-	while (i < len) {//Ôİ²»´¦Àí×ªÒå·û
+	while (i < len) {//æš‚ä¸å¤„ç†è½¬ä¹‰ç¬¦
 		if (str[i] == '\"') {
 			i++;
 			break;
@@ -71,7 +71,7 @@ pair<string,int> getname(int now) {
 		if (str[i] == ':')break;
 		i++;
 	}
-	return make_pair(tmps, i);//½áÊøÓÚ×îºóÒ»¸ö:´¦
+	return make_pair(tmps, i);//ç»“æŸäºæœ€åä¸€ä¸ª:å¤„
 }
 
 int gettype(int x,int now) {
@@ -113,7 +113,7 @@ int getval(int x, int i) {
 		}
 	}
 }
-int build(int x, int now) {
+int build(int x, int now,int step) {
 	int i=now;
 
 	node[x].ifname = checkname(now);
@@ -123,13 +123,13 @@ int build(int x, int now) {
 		i = tmpp.second+1;
 	}
 
-	node[x].type=gettype(x, i);//iÊÇÈ¥³ıÃû×ÖµÄ¿ªÊ¼µã
+	node[x].type=gettype(x, i);//iæ˜¯å»é™¤åå­—çš„å¼€å§‹ç‚¹
 	
 	if (node[x].type == 1)
 	return getval(x, i);
 
 	for (; i < len; i++) {
-		if (str[i] == ' '||str[i]=='n')continue;
+		if (str[i] == ' '||str[i]=='\n')continue;
 		i++; break;
 	}
 	for (; i < len; i++) {
@@ -137,9 +137,9 @@ int build(int x, int now) {
 		node[x].to.push_back(y);
 		JsonNode tmp;
 		node.push_back(tmp);
-		i = build(y, i);
+		i = build(y, i,step+1)+1;
 		int j;
-		for (j = i+1;j<len;j++) {
+		for (j = i;j<len;j++) {
 			if (str[j] == ',') {
 				i=j+1;
 				break;
@@ -150,8 +150,9 @@ int build(int x, int now) {
 	}
 }
 
-void print(int x) {
+void print(int x,int step) {
 	int i;
+	for (i = 1; i <= step; i++)cout << "\t";
 	if (node[x].ifname == 1) {
 		putchar('\"');
 		cout << node[x].name;
@@ -161,21 +162,23 @@ void print(int x) {
 		cout << node[x].val;
 	}
 	if (node[x].type == 2) {
-		putchar('[');
+		putchar('['); putchar('\n');
 		for (i = 0; i < node[x].to.size(); i++) {
-			print(node[x].to[i]);
-			if(i!=node[x].to.size()-1)
-				putchar(',');
+			print(node[x].to[i],step+1);
+			if (i != node[x].to.size() - 1)putchar(',');
+			putchar('\n');
 		}
+		for (int j = 1; j <= step; j++)cout << "\t";
 		putchar(']');
 	}
 	if (node[x].type == 3) {
-		putchar('{');
+		putchar('{'); putchar('\n');
 		for (i = 0; i < node[x].to.size(); i++) {
-			print(node[x].to[i]);
-			if (i != node[x].to.size() - 1)
-				putchar(',');
+			print(node[x].to[i],step+1);
+			if (i != node[x].to.size() - 1)putchar(',');
+			putchar('\n');
 		}
+		for (int j = 1; j <= step; j++)cout << "\t";
 		putchar('}');
 	}
 }
@@ -194,7 +197,7 @@ int main() {
 	//build tree
 	JsonNode tmp;
 	node.push_back(tmp); node.push_back(tmp); JsonNode::top = 1;
-	build(1, 0);
-	print(1);
+	build(1, 0,1);
+	print(1,0);
 	return 0;
 }
